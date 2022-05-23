@@ -1,0 +1,27 @@
+@mixin strict_size($height, $width) {
+  @if $height {
+    height: #{$height};
+    min-height: #{$height};
+    max-height: #{$height};
+  }
+
+  @if $width {
+    width: #{$width};
+    min-width: #{$width};
+    max-width: #{$width};
+  }
+}
+
+@mixin modal_content($height, $width) {
+  .modal__content {
+    @if $height {
+      height: 100%;
+      max-height: $height;
+    }
+
+    @if $width {
+      width: 100%;
+      max-width: $width;
+    }
+  }
+}
