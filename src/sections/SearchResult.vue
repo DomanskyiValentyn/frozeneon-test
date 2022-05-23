@@ -2,7 +2,7 @@
   <div class="search-result">
     <ModalPackageDetail :package="selectPackage" />
 
-    <h2 class="mt-5">Result search: {{ search }}</h2>
+    <h2 class="mt-5">Result search: <small>{{ search }}</small></h2>
 
     <table class="table mt-4">
       <thead>
@@ -14,9 +14,9 @@
         </tr>
       </thead>
       <tbody>
-        <template v-for="(p, index) in result?.objects" :key="index">
+        <template v-for="(p, index) in list" :key="index">
           <tr @click="selectPackage = p" data-bs-toggle="modal" data-bs-target="#package-detail">
-            <th scope="row">{{ index + 1 }}</th>
+            <th scope="row">{{ getNumberPosition(index) }}</th>
             <td>{{ p.package.name }}</td>
             <td>{{ p.package.version }}</td>
             <td>{{ p.package.description }}</td>
@@ -24,6 +24,8 @@
         </template>
       </tbody>
     </table>
+
+    <Pagination :records="result?.objects.length" :perPage="perPage" @paginate="currentPage = $event"/>
   </div>
 </template>
 <script lang="ts">
@@ -33,10 +35,13 @@ import { mapState } from 'vuex';
 
 import ModalPackageDetail from '@/modals/PackageDetail.vue';
 
+import Pagination from '@/common/Pagination/Pagination.vue';
+
 import { SearchPackage, SearchPackageObjects } from '@/interfaces/other.interface';
 
 @Options({
   components: {
+    Pagination,
     ModalPackageDetail,
   },
   computed: {
@@ -48,11 +53,28 @@ export default class SearchResult extends Vue {
 
   public selectPackage: SearchPackageObjects | null = null;
 
-  public modal = {
-    detail: false,
-  }
+  public currentPage = 1;
+
+  public perPage = 10;
 
   private watchStopHandle!: WatchStopHandle;
+
+  get list(): SearchPackageObjects[] {
+    if (this.result?.objects) {
+      const list = [...this.result.objects];
+
+      const start = this.perPage * this.currentPage - this.perPage;
+      const end = start + this.perPage;
+
+      return list.slice(start, end);
+    }
+
+    return [];
+  }
+
+  public getNumberPosition(index: number): number {
+    return index + 1 + this.perPage * this.currentPage - this.perPage;
+  }
 
   public startSearch(): void {
     fetch(`https://registry.npmjs.com/-/v1/search?text=${this.$store.state.search}`)
