@@ -11,17 +11,3 @@
     max-width: #{$width};
   }
 }
-
-@mixin modal_content($height, $width) {
-  .modal__content {
-    @if $height {
-      height: 100%;
-      max-height: $height;
-    }
-
-    @if $width {
-      width: 100%;
-      max-width: $width;
-    }
-  }
-}
